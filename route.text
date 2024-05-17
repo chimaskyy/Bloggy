@@ -1,0 +1,7 @@
+get all pub post...  GET "/post" all user
+get pub post by id.... GET  "/post:id"
+
+create post.... POST "/post" logged in user
+update post.... PUT "/post" 
+delete post.... DELETE "/post"
+
