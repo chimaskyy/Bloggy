@@ -1,4 +1,12 @@
 const Blog = require("../models/Blogs");
+const User = require("../models/Users");
+
+// Utility function to calculate reading time
+const calculateReadingTime = (text) => {
+  const wordsPerMinute = 200; // Average case
+  const textLength = text.split(" ").length; // Split by words
+  return Math.ceil(textLength / wordsPerMinute);
+};
 
 // Create Blog
 exports.createBlog = async (req, res, next) => {
@@ -6,14 +14,22 @@ exports.createBlog = async (req, res, next) => {
     // Get user ID from the authenticated user
     const userId = req.user._id;
 
+    const readingTime = calculateReadingTime(req.body.body);
     // Create the blog with initial state as draft
     const blog = await Blog.create({
       ...req.body,
       author: userId,
       state: "draft",
+      read_count: 0,
+      reading_time: readingTime,
     });
+    // Populate author details (first name and last name)
+     const populatedBlog = await Blog.findById(blog._id).populate(
+       "author",
+       "first_name last_name"
+     );
 
-    res.status(201).json(blog);
+    res.status(201).json(populatedBlog);
   } catch (error) {
     next(error);
   }

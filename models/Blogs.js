@@ -13,7 +13,7 @@ const BlogSchema = new schema({
   },
   author: {
     type: schema.Types.ObjectId, // Use ObjectId to reference another document
-    ref: "Users", // Reference the User model
+    ref: "users", // Reference the User model
     required: true,
   },
   state: {
@@ -29,6 +29,7 @@ const BlogSchema = new schema({
   read_count: {
     type: Number,
     required: true,
+    default: 0,
   },
   tags: {
     type: [String],
