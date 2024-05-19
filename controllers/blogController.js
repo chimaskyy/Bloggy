@@ -3,9 +3,17 @@ const User = require("../models/Users");
 
 // Utility function to calculate reading time
 const calculateReadingTime = (text) => {
-  const wordsPerMinute = 200; // Average case
-  const textLength = text.split(" ").length; // Split by words
-  return Math.ceil(textLength / wordsPerMinute);
+  if (!text || text.trim() === "") {
+    return "Less than 1 minute"; 
+  }
+
+  const wordsPerMinute = 200;
+  const wordRegex = /\b\w+\b/g;
+  const textLength = text.match(wordRegex).length;
+  const minutes = Math.ceil(textLength / wordsPerMinute);
+  // const seconds = (minutes * 60) % 60; 
+
+  return `${minutes} minute${minutes === 1 ? "" : "s"}`;
 };
 
 // Create Blog
@@ -13,6 +21,7 @@ exports.createBlog = async (req, res, next) => {
   try {
     // Get user ID from the authenticated user
     const userId = req.user._id;
+    const username = req.user.username;
 
     const readingTime = calculateReadingTime(req.body.body);
     // Create the blog with initial state as draft
@@ -23,13 +32,17 @@ exports.createBlog = async (req, res, next) => {
       read_count: 0,
       reading_time: readingTime,
     });
-    // Populate author details (first name and last name)
-     const populatedBlog = await Blog.findById(blog._id).populate(
-       "author",
-       "first_name last_name"
-     );
 
-    res.status(201).json(populatedBlog);
+    // Construct the response with the username
+    const response = {
+      ...blog.toObject(),
+      author: username, // Overwrite the author field with the username
+    };
+
+    res.status(201).json({
+      count: 1,
+      data: response,
+    });
   } catch (error) {
     next(error);
   }
@@ -124,7 +137,13 @@ exports.getBlogList = async (req, res, next) => {
       .sort(sort)
       .populate("author", "first_name last_name");
 
-    res.json(blogs);
+    // Get the total count of blogs
+    const totalBlogs = await Blog.countDocuments(filters);
+
+    res.json({
+      count: totalBlogs,
+      data: blogs,
+    });
   } catch (error) {
     next(error);
   }
@@ -140,13 +159,16 @@ exports.getSingleBlog = async (req, res, next) => {
       id,
       { $inc: { read_count: 1 } },
       { new: true }
-    ).populate("author", "first_name last_name");
+    ).populate("author", "username");
 
     if (!blog) {
       return res.status(404).json({ message: "Blog not found" });
     }
 
-    res.json(blog);
+    res.json({
+      count: 1,
+      data: blog,
+    });
   } catch (error) {
     next(error);
   }
@@ -159,9 +181,15 @@ exports.getUserBlogs = async (req, res, next) => {
     const userId = req.user._id;
 
     // Fetch blogs created by the user
-    const userBlogs = await Blog.find({ author: userId });
+     const userBlogs = await Blog.find({ author: userId }).populate(
+       "author",
+       "username"
+     );
 
-    res.json(userBlogs);
+    res.json({
+      count: userBlogs.length,
+      data: userBlogs,
+    });
   } catch (error) {
     next(error);
   }

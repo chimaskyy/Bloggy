@@ -22,7 +22,7 @@ const BlogSchema = new schema({
     default: "draft",
   },
   reading_time: {
-    type: Number,
+    type: String,
     required: true,
     default: 0,
   },
@@ -33,7 +33,7 @@ const BlogSchema = new schema({
   },
   tags: {
     type: [String],
-    required: true,
+    required: false,
   },
   body: {
     type: String,

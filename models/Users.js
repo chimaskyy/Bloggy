@@ -21,6 +21,12 @@ const UserSchema = new Schema({
     type: String,
     required: true,
   },
+
+  username: {
+    type: String,
+    required: true,
+    unique: true,
+  },
 });
 
 // Pre-save middleware to hash the password before saving the user document
