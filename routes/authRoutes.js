@@ -35,7 +35,9 @@ auth.post("/login", async (req, res, next) => {
         const body = { _id: user._id, email: user.email };
 
         // Generate JWT token with user data and secret key
-        const token = jwt.sign({ user: body }, process.env.JWT_SECRET);
+        const token = jwt.sign({ user: body }, process.env.JWT_SECRET, {
+          expiresIn: "1h", // Set token to expire in 1 hour
+        });
 
         // Send the JWT token in the response
         return res.json({ token });
