@@ -13,7 +13,7 @@ const calculateReadingTime = (text) => {
   const minutes = Math.ceil(textLength / wordsPerMinute);
   // const seconds = (minutes * 60) % 60; 
 
-  return `${minutes} minute${minutes === 1 ? "" : "s"}`;
+  return `${minutes} minute${minutes === 1 ? "" : "s"} read`;
 };
 
 // Create Blog
