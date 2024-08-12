@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
+const { post } = require("../routes/blogRoutes");
 
 const Schema = mongoose.Schema;
 
@@ -27,6 +28,13 @@ const UserSchema = new Schema({
     required: true,
     unique: true,
   },
+  posts: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "Blog",
+      default: [],
+    },
+  ],
 });
 
 // Pre-save middleware to hash the password before saving the user document
@@ -44,6 +52,12 @@ UserSchema.methods.isValidPassword = async function (password) {
   const compare = await bcrypt.compare(password, user.password);
 
   return compare;
+};
+// Instance method to hide the password in responses
+UserSchema.methods.toJSON = function () {
+  const obj = this.toObject();
+  delete obj.password;
+  return obj;
 };
 
 const UserModel = mongoose.model("users", UserSchema);

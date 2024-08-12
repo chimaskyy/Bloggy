@@ -1,5 +1,5 @@
 {
-  "watch": ["Bloggy/**/*"],
+  "watch": ["Bloggy/server/**/*"],
   "ext": "js",
-  "exec": "node server.js"
+  "exec": "node server/server.js"
 }

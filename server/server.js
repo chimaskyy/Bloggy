@@ -3,18 +3,17 @@ const mongoose = require("mongoose");
 const passport = require("passport");
 const bodyParser = require("body-parser");
 const cors = require("cors");
-const userRoutes = require("./routes/authRoutes");
 require("dotenv").config();
-require("./config/passport");
-const { connectToMongoDB } = require("./config/db");
+require("./api/config/passport");
+const { connectToMongoDB } = require("./api/config/db");
 
 // Connect to MongoDB
 connectToMongoDB();
 
 // Define routes
-const authRoutes = require('./routes/authRoutes');
-const blogRoutes = require('./routes/blogRoutes');
-
+const authRoutes = require("./api/routes/authRoutes");
+const blogRoutes = require("./api/routes/blogRoutes");
+const userRoutes = require("./api/routes/userRoutes");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -25,7 +24,7 @@ app.use(passport.initialize());
 
 app.use("/auth", authRoutes);
 app.use("/blog", blogRoutes);
-
+app.use("/users", userRoutes);
 
 // MongoDB connection
 // mongoose
